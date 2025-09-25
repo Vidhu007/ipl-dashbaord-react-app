@@ -1,8 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-// For the new chart feature, you'll need to install recharts:
-// npm install recharts
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import React, { useState, useEffect, JSX } from 'react';
 
 // --- TYPE DEFINITIONS ---
 interface Team {
@@ -104,7 +101,7 @@ const Header: React.FC = () => (
 
 const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
   const isLive = match.status === 'live';
-  
+
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 m-4">
       <div className={`p-4 ${isLive ? 'bg-red-600' : 'bg-blue-600'} text-white`}>
@@ -122,11 +119,12 @@ const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
         </div>
         <p className="text-sm opacity-90">{match.venue}</p>
       </div>
-      
+
       <div className="p-4 md:p-6 bg-gray-50">
         <div className="flex items-center justify-between space-x-4">
+          {/* Team A */}
           <div className="flex flex-col items-center flex-1 text-center">
-            <img src={match.teamA.logo} alt={match.teamA.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200"/>
+            <img src={match.teamA.logo} alt={match.teamA.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200" />
             <h3 className="font-semibold text-gray-800 text-sm md:text-base">{match.teamA.name}</h3>
           </div>
 
@@ -138,71 +136,31 @@ const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
               </div>
               <span className="font-mono text-gray-500 text-lg">vs</span>
               <div className="font-bold text-xl md:text-2xl text-gray-900">
-                 <span>{match.scoreB?.runs}/{match.scoreB?.wickets}</span>
-                 <span className="text-sm font-normal text-gray-500"> ({match.scoreB?.overs})</span>
+                <span>{match.scoreB?.runs}/{match.scoreB?.wickets}</span>
+                <span className="text-sm font-normal text-gray-500"> ({match.scoreB?.overs})</span>
               </div>
             </div>
           ) : (
-             <div className="flex-shrink-0 text-center">
+            <div className="flex-shrink-0 text-center">
               <p className="font-bold text-xl md:text-2xl text-blue-700">
                 {new Date(match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
               <span className="font-mono text-gray-500 text-lg">vs</span>
-               <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 {new Date(match.startTime).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
               </p>
             </div>
           )}
 
+          {/* Team B */}
           <div className="flex flex-col items-center flex-1 text-center">
-            <img src={match.teamB.logo} alt={match.teamB.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200"/>
+            <img src={match.teamB.logo} alt={match.teamB.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200" />
             <h3 className="font-semibold text-gray-800 text-sm md:text-base">{match.teamB.name}</h3>
           </div>
         </div>
       </div>
       <div className="p-3 bg-gray-100 border-t border-gray-200 text-center">
         <p className="text-sm text-gray-700 italic">{match.commentary}</p>
-      </div>
-    </div>
-  );
-};
-
-// --- NEW VISUALIZATION COMPONENT ---
-const NetRunRateChart: React.FC<{ data: TeamStanding[] }> = ({ data }) => {
-  const chartData = data.map(team => ({
-    name: team.team.shortName,
-    nrr: parseFloat(team.nrr),
-    fullName: team.team.name
-  }));
-
-  const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-2 border border-gray-300 rounded shadow-lg">
-          <p className="font-bold">{payload[0].payload.fullName}</p>
-          <p className="text-sm">{`NRR: ${payload[0].value}`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  return (
-    <div className="m-4 bg-white rounded-xl shadow-lg p-4 border border-gray-200">
-      <h3 className="text-lg font-bold mb-4 text-gray-800">Team Net Run Rate (NRR)</h3>
-      <div style={{ width: '100%', height: 300 }}>
-        <ResponsiveContainer>
-          <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(206, 212, 218, 0.4)' }} />
-            <Bar dataKey="nrr">
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.nrr >= 0 ? '#22c55e' : '#ef4444'} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
       </div>
     </div>
   );
@@ -231,7 +189,7 @@ const PointsTable: React.FC<{ standings: TeamStanding[] }> = ({ standings }) => 
               <td className="py-3 px-3 font-medium text-gray-900 text-center">{s.position}</td>
               <td className="py-3 px-4">
                 <div className="flex items-center">
-                  <img src={s.team.logo} alt={s.team.name} className="w-6 h-6 rounded-full mr-3"/>
+                  <img src={s.team.logo} alt={s.team.name} className="w-6 h-6 rounded-full mr-3" />
                   <span className="font-semibold text-gray-800">{s.team.name}</span>
                 </div>
               </td>
@@ -251,7 +209,7 @@ const PointsTable: React.FC<{ standings: TeamStanding[] }> = ({ standings }) => 
 
 const ScheduleList: React.FC<{ matches: ScheduledMatch[] }> = ({ matches }) => (
   <div className="m-4">
-     <h2 className="text-xl font-bold p-4 bg-white rounded-t-xl shadow-lg border-gray-200 border">Upcoming Schedule</h2>
+    <h2 className="text-xl font-bold p-4 bg-white rounded-t-xl shadow-lg border-gray-200 border">Upcoming Schedule</h2>
     <div className="space-y-3">
       {matches.map(match => (
         <div key={match.id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200 hover:shadow-xl transition-shadow duration-300">
@@ -261,13 +219,13 @@ const ScheduleList: React.FC<{ matches: ScheduledMatch[] }> = ({ matches }) => (
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img src={match.teamA.logo} alt={match.teamA.shortName} className="w-8 h-8"/>
+              <img src={match.teamA.logo} alt={match.teamA.shortName} className="w-8 h-8" />
               <span className="font-bold text-base">{match.teamA.name}</span>
             </div>
             <span className="text-gray-500 font-mono">vs</span>
-             <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
               <span className="font-bold text-base">{match.teamB.name}</span>
-              <img src={match.teamB.logo} alt={match.teamB.shortName} className="w-8 h-8"/>
+              <img src={match.teamB.logo} alt={match.teamB.shortName} className="w-8 h-8" />
             </div>
           </div>
           <div className="text-center mt-3 pt-3 border-t border-dashed">
@@ -290,6 +248,14 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // In a real Next.js app, you would fetch this data from your API route:
+    // fetch('/api/scrape')
+    //   .then(res => res.json())
+    //   .then(setData)
+    //   .catch(err => console.error("Failed to fetch data", err))
+    //   .finally(() => setLoading(false));
+
+    // Simulating API call with a delay
     setLoading(true);
     const timer = setTimeout(() => {
       setData(dummyData);
@@ -297,7 +263,7 @@ export default function App() {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-  
+
   const currentMatch = data?.liveMatch?.status === 'live' ? data.liveMatch : data?.upcomingMatch;
 
   const renderContent = () => {
@@ -315,18 +281,13 @@ export default function App() {
         return (
           <div>
             {currentMatch && <LiveMatchCard match={currentMatch} />}
-            <div className="md:hidden"> 
+            <div className="md:hidden">
               <PointsTable standings={data.pointsTable.slice(0, 4)} />
             </div>
           </div>
         );
       case 'points':
-        return (
-          <>
-            <PointsTable standings={data.pointsTable} />
-            <NetRunRateChart data={data.pointsTable} />
-          </>
-        );
+        return <PointsTable standings={data.pointsTable} />;
       case 'schedule':
         return <ScheduleList matches={data.schedule} />;
       default:
@@ -335,15 +296,14 @@ export default function App() {
   };
 
   const NavItem: React.FC<{ tab: Tab; icon: JSX.Element; label: string }> = ({ tab, icon, label }) => (
-      <button
-          onClick={() => setActiveTab(tab)}
-          className={`flex-1 flex flex-col items-center justify-center p-2 text-sm transition-colors duration-200 ${
-              activeTab === tab ? 'text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-100 rounded-lg'
-          }`}
-      >
-          {React.cloneElement(icon, { className: 'h-6 w-6 mb-1' })}
-          <span>{label}</span>
-      </button>
+    <button
+      onClick={() => setActiveTab(tab)}
+      className={`flex-1 flex flex-col items-center justify-center p-2 text-sm transition-colors duration-200 ${activeTab === tab ? 'text-blue-600 font-bold' : 'text-gray-500 hover:bg-gray-100 rounded-lg'
+        }`}
+    >
+      {React.cloneElement(icon, { className: 'h-6 w-6 mb-1' })}
+      <span>{label}</span>
+    </button>
   );
 
   return (
@@ -351,51 +311,46 @@ export default function App() {
       <Header />
       <main className="container mx-auto pb-20">
         <div className="lg:flex lg:space-x-4">
-            <div className="lg:w-2/3">
-                 {loading ? (
-                     <div className="flex justify-center items-center h-64">
-                       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
-                     </div>
-                 ) : (
-                     currentMatch && <LiveMatchCard match={currentMatch} />
-                 )}
-                <div className="hidden lg:block">
-                     {data && <ScheduleList matches={data.schedule} />}
-                </div>
+          <div className="lg:w-2/3">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : (
+              currentMatch && <LiveMatchCard match={currentMatch} />
+            )}
+            <div className="hidden lg:block">
+              {data && <ScheduleList matches={data.schedule} />}
             </div>
-            <div className="lg:w-1/3">
-                 {data && (
-                  <>
-                    <PointsTable standings={data.pointsTable} />
-                    <NetRunRateChart data={data.pointsTable} />
-                  </>
-                 )}
-            </div>
+          </div>
+          <div className="lg:w-1/3">
+            {data && <PointsTable standings={data.pointsTable} />}
+          </div>
         </div>
-        
+
         {/* Mobile View with Tabs */}
-         <div className="lg:hidden">
+        <div className="lg:hidden">
           {renderContent()}
         </div>
       </main>
 
       {/* Bottom Navigation for Mobile */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg flex justify-around z-20">
-          <NavItem
-              tab="live"
-              icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048l5.962 5.962-5.962 5.962" /></svg>}
-              label="Match"
-          />
-          <NavItem
-              tab="points"
-              icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>}
-              label="Table"
-          />
-          <NavItem
-              tab="schedule"
-              icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" /></svg>}
-              label="Schedule"
-          />
+        <NavItem
+          tab="live"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048l5.962 5.962-5.962 5.962" /></svg>}
+          label="Match"
+        />
+        <NavItem
+          tab="points"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>}
+          label="Table"
+        />
+        <NavItem
+          tab="schedule"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18" /></svg>}
+          label="Schedule"
+        />
       </nav>
     </div>
   );
