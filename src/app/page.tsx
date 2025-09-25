@@ -1,5 +1,8 @@
 "use client";
 import React, { useState, useEffect, JSX } from 'react';
+// For the chart feature, you'll need to install recharts:
+// npm install recharts
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 // --- TYPE DEFINITIONS ---
 interface Team {
@@ -122,7 +125,6 @@ const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
 
       <div className="p-4 md:p-6 bg-gray-50">
         <div className="flex items-center justify-between space-x-4">
-          {/* Team A */}
           <div className="flex flex-col items-center flex-1 text-center">
             <img src={match.teamA.logo} alt={match.teamA.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200" />
             <h3 className="font-semibold text-gray-800 text-sm md:text-base">{match.teamA.name}</h3>
@@ -152,7 +154,6 @@ const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
             </div>
           )}
 
-          {/* Team B */}
           <div className="flex flex-col items-center flex-1 text-center">
             <img src={match.teamB.logo} alt={match.teamB.name} className="w-14 h-14 md:w-16 md:h-16 rounded-full mb-2 border-2 border-gray-200" />
             <h3 className="font-semibold text-gray-800 text-sm md:text-base">{match.teamB.name}</h3>
@@ -161,6 +162,47 @@ const LiveMatchCard: React.FC<{ match: LiveMatch }> = ({ match }) => {
       </div>
       <div className="p-3 bg-gray-100 border-t border-gray-200 text-center">
         <p className="text-sm text-gray-700 italic">{match.commentary}</p>
+      </div>
+    </div>
+  );
+};
+
+// --- NEW VISUALIZATION COMPONENT ---
+const NetRunRateChart: React.FC<{ data: TeamStanding[] }> = ({ data }) => {
+  const chartData = data.map(team => ({
+    name: team.team.shortName,
+    nrr: parseFloat(team.nrr),
+    fullName: team.team.name
+  }));
+
+  const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-2 border border-gray-300 rounded shadow-lg">
+          <p className="font-bold">{payload[0].payload.fullName}</p>
+          <p className="text-sm">{`NRR: ${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="m-4 bg-white rounded-xl shadow-lg p-4 border border-gray-200">
+      <h3 className="text-lg font-bold mb-4 text-gray-800">Team Net Run Rate (NRR)</h3>
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer>
+          <BarChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(206, 212, 218, 0.4)' }} />
+            <Bar dataKey="nrr">
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.nrr >= 0 ? '#22c55e' : '#ef4444'} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
@@ -248,14 +290,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real Next.js app, you would fetch this data from your API route:
-    // fetch('/api/scrape')
-    //   .then(res => res.json())
-    //   .then(setData)
-    //   .catch(err => console.error("Failed to fetch data", err))
-    //   .finally(() => setLoading(false));
-
-    // Simulating API call with a delay
     setLoading(true);
     const timer = setTimeout(() => {
       setData(dummyData);
@@ -287,7 +321,12 @@ export default function App() {
           </div>
         );
       case 'points':
-        return <PointsTable standings={data.pointsTable} />;
+        return (
+          <>
+            <PointsTable standings={data.pointsTable} />
+            <NetRunRateChart data={data.pointsTable} />
+          </>
+        );
       case 'schedule':
         return <ScheduleList matches={data.schedule} />;
       default:
@@ -310,21 +349,27 @@ export default function App() {
     <div className="bg-gray-100 min-h-screen font-sans">
       <Header />
       <main className="container mx-auto pb-20">
-        <div className="lg:flex lg:space-x-4">
+        {/* Desktop View (Multi-column) */}
+        <div className="hidden lg:flex lg:space-x-4 p-4">
           <div className="lg:w-2/3">
             {loading ? (
-              <div className="flex justify-center items-center h-64">
+              <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200 m-4 flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             ) : (
               currentMatch && <LiveMatchCard match={currentMatch} />
             )}
-            <div className="hidden lg:block">
+            <div>
               {data && <ScheduleList matches={data.schedule} />}
             </div>
           </div>
           <div className="lg:w-1/3">
-            {data && <PointsTable standings={data.pointsTable} />}
+            {data && (
+              <>
+                <PointsTable standings={data.pointsTable} />
+                <NetRunRateChart data={data.pointsTable} />
+              </>
+            )}
           </div>
         </div>
 
