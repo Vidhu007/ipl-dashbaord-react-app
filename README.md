@@ -4,7 +4,11 @@ A responsive, mobile-first dashboard application built with **Next.js**, **React
 
 ---
 
-## ✨ Features
+## Deployed link
+
+https://ipl-dashbaord-react-app.vercel.app/
+
+## Features
 
 - **Live/Upcoming Match**: A prominent card displays the current live match with scores or the next upcoming match with timings.
 - **Points Table**: A clear, color-coded table showing the latest team standings, including points, net run rate, wins, and losses.
@@ -13,7 +17,7 @@ A responsive, mobile-first dashboard application built with **Next.js**, **React
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js (with App Router)
 - **Library**: React
@@ -23,11 +27,11 @@ A responsive, mobile-first dashboard application built with **Next.js**, **React
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-### ✅ Prerequisites
+### Prerequisites
 
 Make sure you have the following installed on your system:
 
@@ -36,7 +40,7 @@ Make sure you have the following installed on your system:
 
 ---
 
-### ⚡ Setup and Installation
+### Setup and Installation
 
 Clone the repository:
 
@@ -58,24 +62,31 @@ Go to http://localhost:3000
  ipl-dashboard/
 
 The project uses the Next.js App Router. Here are the key files:
-├── app/
-│   ├── page.tsx        # Main entry point with the dashboard component
-│   ├── layout.tsx      # Root layout
-│   └── globals.css     # Tailwind CSS directives
-├── pages/
-│   └── api/
-│       └── scrape.ts   # API endpoint for web scraping (to be created)
 
-🔄 Data Fetching: From Dummy to Live Data
+my-app/
+└── src/
+    ├── app/
+    │   └── page.tsx          # Main page component
+    ├── components/
+    │   ├── Header.tsx
+    │   ├── LiveMatchCard.tsx
+    │   ├── NetRunRateChart.tsx
+    │   ├── PointsTable.tsx
+    │   └── ScheduleList.tsx
+    └── lib/
+        ├── data.ts           # Dummy data
+        └── types.ts          # All TypeScript interfaces
 
-Currently, the component in app/page.tsx uses static dummy data for demonstration purposes.
+Data Fetching: From Dummy to Live Data
+
+Currently, I am using static dummy data for demo ..so in the component in app/page.tsx.
 To make the application dynamic, you need to implement a web scraping API endpoint.
 
 1. Create the API Route
 
 Create a file at:
 
-pages/api/scrape.ts
+src/api/scrape.ts
 
 2. Implement Scraping Logic
 
@@ -86,7 +97,7 @@ Inspect the live website to find the correct CSS selectors for the data you want
 
 Modify the useEffect hook in app/page.tsx to fetch data from your /api/scrape endpoint instead of using local dummyData.
 
-Example:
+Eg:
 
 // Inside the App component in app/page.tsx
 
@@ -99,8 +110,4 @@ useEffect(() => {
     .finally(() => setLoading(false));
 }, []);
 
-
-⚠️ Note: Web scraping can be fragile.
-If the source website’s HTML structure changes, your scraper may break.
-Always include robust error handling.
 ```
